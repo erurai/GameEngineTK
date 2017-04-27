@@ -84,5 +84,13 @@ private:
 
 	std::unique_ptr<DirectX::Model> m_sky_dome;
 	std::unique_ptr<DirectX::Model> m_ground;
+	std::unique_ptr<DirectX::Model> m_ball;
+	//地面のワールド行列
+	DirectX::SimpleMath::Matrix m_world_ground[200][200];
+	//球のワールド行列
+	DirectX::SimpleMath::Matrix m_world_ball[20];
+
+	float m_radian1;			//角度
+	float m_radian2;	//逆回転させる角度
 
 };

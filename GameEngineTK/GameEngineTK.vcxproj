@@ -193,6 +193,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <MeshContentTask Include="Assets\Ball.FBX" />
     <MeshContentTask Include="Assets\Ground_1M.FBX" />
     <MeshContentTask Include="Assets\SkyDome.FBX" />
   </ItemGroup>

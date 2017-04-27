@@ -69,6 +69,11 @@ void Game::Initialize(HWND window, int width, int height)
 	//モデルの読み込み
 	m_sky_dome = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/SkyDome.cmo", *m_factory);
 	m_ground = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/Ground_1M.cmo", *m_factory);
+	m_ball = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/Ball.cmo", *m_factory);
+
+	//角度の初期化
+	m_radian1 = 0.0f;
+	m_radian2 = 0.0f;
 	
 }
 
@@ -94,6 +99,77 @@ void Game::Update(DX::StepTimer const& timer)
 	//　ゲームの毎フレーム処理
 	//	デバッグカメラの更新
 	m_debugCamera->Update();
+
+	//角度の計算
+	m_radian1 += 360.0f / 180.0f;
+	m_radian2 -= 360.0f / 180.0f;
+
+	//地面のワールド行列の計算
+	for (int i = -100; i < 100; i++)
+	{
+		for (int j = -100; j < 100; j++)
+		{
+			//スケーリング行列
+			Matrix scalemat = Matrix::CreateScale(1.0f);
+
+			//ローテーション（回転）行列
+			//ロール
+			Matrix rotmat_z = Matrix::CreateRotationX(XMConvertToRadians(0.0f));
+			//ピッチ
+			Matrix rotmat_x = Matrix::CreateRotationY(XMConvertToRadians(0.0f));
+			//ヨー
+			Matrix rotmat_y = Matrix::CreateRotationX(XMConvertToRadians(0.0f));
+			//ローテーション行列の合成
+			Matrix rotmat = rotmat_z * rotmat_x * rotmat_y;
+
+			//トランスレーション（平行移動）行列
+			Matrix transmat = Matrix::CreateTranslation(i * 1.0f, 0.0f, j * 1.0f);
+
+			m_world_ground[i + 100][j + 100] = scalemat * transmat * rotmat;
+		}
+	}
+
+	//球のワールド行列の計算
+	for (int i = 0; i < 20; i++)
+	{
+		//スケーリング行列
+		Matrix scalemat = Matrix::CreateScale(1.0f);
+
+		//ローテーション（回転）行列
+		//ロール
+		Matrix rotmat_z = Matrix::CreateRotationX(XMConvertToRadians(0.0f));
+		//ピッチ
+		Matrix rotmat_x;
+		if (i < 10)
+		{
+			//回転
+			rotmat_x = Matrix::CreateRotationY(XMConvertToRadians(360.0f / 10 * (i + 1) + m_radian1));
+		}
+		else
+		{
+			//逆回転
+			rotmat_x = Matrix::CreateRotationY(XMConvertToRadians(360.0f / 10 * (i + 1) + m_radian2));
+		}
+		//ヨー
+		Matrix rotmat_y = Matrix::CreateRotationX(XMConvertToRadians(0.0f));
+		//ローテーション行列の合成
+		Matrix rotmat = rotmat_z * rotmat_x * rotmat_y;
+		//トランスレーション（平行移動）行列
+		Matrix transmat;
+
+		if (i < 10)
+		{
+			//トランスレーション（平行移動）行列
+			transmat = Matrix::CreateTranslation(20.0f, 0.0f, 0.0f);
+		}
+		else
+		{
+			//トランスレーション（平行移動）行列
+			transmat = Matrix::CreateTranslation(40.0f, 0.0f, 0.0f);
+		}
+
+		m_world_ball[i] = scalemat * transmat * rotmat;
+	}
 
 }
 
@@ -148,9 +224,21 @@ void Game::Render()
 
 	//天球を描画
 	m_sky_dome->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
-	//地面を描画
-	m_ground->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
 
+	//地面を描画
+	for (int i = 0; i < 200; i++)
+	{
+		for (int j = 0; j < 200; j++)
+		{
+			m_ground->Draw(m_d3dContext.Get(), *m_states, m_world_ground[i][j], m_view, m_proj);
+		}
+	}
+
+	//球を描画
+	for (int i = 0; i < 20; i++)
+	{
+		m_ball->Draw(m_d3dContext.Get(), *m_states, m_world_ball[i], m_view, m_proj);
+	}
 	m_batch->Begin();
 	//m_batch->DrawLine(
 	//	VertexPositionColor(DirectX::SimpleMath::Vector3(0.0f, 0.0f, 0.0f),SimpleMath::Color(1.0f, 1.0f, 1.0f)),
