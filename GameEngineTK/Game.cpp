@@ -21,6 +21,15 @@ Game::Game() :
 {
 }
 
+Vector3 Lerp(Vector3 startPosition, Vector3 targetPosition, float t)
+{
+	Vector3 lerpPosition = Vector3(0.0f,0.0f,0.0f);
+
+	lerpPosition = (1 - t) * startPosition + t * targetPosition;
+
+	return lerpPosition;
+}
+
 // Initialize the Direct3D resources required to run.
 void Game::Initialize(HWND window, int width, int height)
 {
@@ -70,11 +79,26 @@ void Game::Initialize(HWND window, int width, int height)
 	m_sky_dome = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/SkyDome.cmo", *m_factory);
 	m_ground = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/Ground_200M.cmo", *m_factory);
 	m_ball = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/Ball.cmo", *m_factory);
+	m_teapot = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/Teapot.cmo", *m_factory);
+
+	//大きさの初期化
+	m_scale = 1.0f;
+	m_scale_flag = false;
 
 	//角度の初期化
 	m_radian1 = 0.0f;
 	m_radian2 = 0.0f;
-	
+
+	//場所の変数の初期化
+	for (int i = 0; i < 20; i++)
+	{
+		m_pos_x[i] = rand() % 200 - 100;
+		m_pos_z[i] = rand() % 200 - 100;
+	}
+
+	//時間の初期化
+	m_time = 0.0f;
+
 }
 
 // Executes the basic game loop.
@@ -100,9 +124,35 @@ void Game::Update(DX::StepTimer const& timer)
 	//	デバッグカメラの更新
 	m_debugCamera->Update();
 
+	//時間の計算
+	m_time += 1.0f / 60.0f / 10.0f;
+	if (m_time >= 1.0f)
+	{
+		m_time = 1.0f;
+	}
+
 	//角度の計算
 	m_radian1 += 360.0f / 180.0f;
 	m_radian2 -= 360.0f / 180.0f;
+
+	//大きさの計算
+	if (m_scale_flag == false)
+	{
+		m_scale += 1.0f / 100;
+	}
+	else
+	{
+		m_scale -= 1.0f / 100;
+	}
+
+	if (m_scale >= 5.0f)
+	{
+		m_scale_flag = true;
+	}
+	else if(m_scale <= 1.0f)
+	{
+		m_scale_flag = false;
+	}
 
 	//球のワールド行列の計算
 	for (int i = 0; i < 20; i++)
@@ -146,6 +196,26 @@ void Game::Update(DX::StepTimer const& timer)
 		m_world_ball[i] = scalemat * transmat * rotmat;
 	}
 
+	//ティーポットの行列の計算
+	for (int i = 0; i < 20; i++)
+	{
+		//スケーリング行列
+		Matrix t_scalemat = Matrix::CreateScale(m_scale);
+		//ローテーション行列
+		//ロール
+		Matrix t_rotmat_z = Matrix::CreateRotationZ(0.0f);
+		//ピッチ
+		Matrix t_rotmat_x = Matrix::CreateRotationX(0.0f);
+		//ヨー
+		Matrix t_rotmat_y = Matrix::CreateRotationY(m_radian1 / 100);
+		//ローテーション行列の合成
+		Matrix t_rotmat = t_rotmat_z * t_rotmat_x * t_rotmat_y;
+		//トランスレーション行列
+		//Matrix t_transmat = Matrix::CreateTranslation(m_pos_x[i], 0.0f, m_pos_z[i]);
+		Matrix t_transmat = Matrix::CreateTranslation(Lerp(Vector3(m_pos_x[i], 0.0f, m_pos_z[i]), Vector3(0.0f, 0.0f, 0.0f), m_time));
+		//各行列の合成
+		m_world_teapot[i] = t_scalemat * t_rotmat * t_transmat;
+	}
 }
 
 // Draws the scene.
@@ -208,6 +278,13 @@ void Game::Render()
 	{
 		m_ball->Draw(m_d3dContext.Get(), *m_states, m_world_ball[i], m_view, m_proj);
 	}
+
+	//ティーポットを描画
+	for (int i = 0; i < 20; i++)
+	{
+		m_teapot->Draw(m_d3dContext.Get(), *m_states, m_world_teapot[i], m_view, m_proj);
+	}
+
 	m_batch->Begin();
 	//m_batch->DrawLine(
 	//	VertexPositionColor(DirectX::SimpleMath::Vector3(0.0f, 0.0f, 0.0f),SimpleMath::Color(1.0f, 1.0f, 1.0f)),
@@ -221,7 +298,7 @@ void Game::Render()
 	//m_batch->DrawTriangle(v1, v2, v3);
 
 	//四角形の描画
-	m_batch->DrawIndexed(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, indices, 6, vertices, 4);
+	//m_batch->DrawIndexed(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, indices, 6, vertices, 4);
 
 	m_batch->End();
 

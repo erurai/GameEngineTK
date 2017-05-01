@@ -85,10 +85,22 @@ private:
 	std::unique_ptr<DirectX::Model> m_sky_dome;
 	std::unique_ptr<DirectX::Model> m_ground;
 	std::unique_ptr<DirectX::Model> m_ball;
+	std::unique_ptr<DirectX::Model> m_teapot;
+
 	//球のワールド行列
 	DirectX::SimpleMath::Matrix m_world_ball[20];
+	//ティーポットのワールド行列
+	DirectX::SimpleMath::Matrix m_world_teapot[20];
 
-	float m_radian1;			//角度
+	float m_scale;		//大きさ
+	bool m_scale_flag;	//大きさを増減させるフラグ
+
+	float m_radian1;	//角度
 	float m_radian2;	//逆回転させる角度
+
+	float m_pos_x[20];	//x座標
+	float m_pos_z[20];	//z座標
+
+	float m_time;
 
 };
