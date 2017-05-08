@@ -12,6 +12,7 @@
 #include <SimpleMath.h>
 #include "DebugCamera.h"
 #include <Model.h>
+#include <Keyboard.h>
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -86,11 +87,14 @@ private:
 	std::unique_ptr<DirectX::Model> m_ground;
 	std::unique_ptr<DirectX::Model> m_ball;
 	std::unique_ptr<DirectX::Model> m_teapot;
+	std::unique_ptr<DirectX::Model> m_head;
 
 	//球のワールド行列
 	DirectX::SimpleMath::Matrix m_world_ball[20];
 	//ティーポットのワールド行列
 	DirectX::SimpleMath::Matrix m_world_teapot[20];
+	//頭パーツのワールド行列
+	DirectX::SimpleMath::Matrix m_world_head;
 
 	float m_scale;		//大きさ
 	bool m_scale_flag;	//大きさを増減させるフラグ
@@ -102,5 +106,9 @@ private:
 	float m_pos_z[20];	//z座標
 
 	float m_time;
+
+	DirectX::SimpleMath::Vector3 m_head_pos;
+	DirectX::SimpleMath::Vector3 m_head_vec;
+	std::unique_ptr<DirectX::Keyboard> m_keyboard;
 
 };

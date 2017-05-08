@@ -80,6 +80,7 @@ void Game::Initialize(HWND window, int width, int height)
 	m_ground = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/Ground_200M.cmo", *m_factory);
 	m_ball = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/Ball.cmo", *m_factory);
 	m_teapot = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/Teapot.cmo", *m_factory);
+	m_head = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/Head.cmo", *m_factory);
 
 	//大きさの初期化
 	m_scale = 1.0f;
@@ -98,6 +99,9 @@ void Game::Initialize(HWND window, int width, int height)
 
 	//時間の初期化
 	m_time = 0.0f;
+
+	//キーボードの初期化
+	m_keyboard = make_unique<Keyboard>();
 
 }
 
@@ -216,6 +220,66 @@ void Game::Update(DX::StepTimer const& timer)
 		//各行列の合成
 		m_world_teapot[i] = t_scalemat * t_rotmat * t_transmat;
 	}
+
+	//キーボードの状態を取得
+	Keyboard::State kb = m_keyboard->GetState();
+
+	//左旋回
+	if (kb.A)
+	{
+		//自機の方向を旋回
+		m_head_vec.y += 0.03f;
+	}
+	//右旋回
+	if (kb.D)
+	{
+		//自機の方向を旋回
+		m_head_vec.y -= 0.03f;
+	}
+	//前進
+	if (kb.W)
+	{
+		//移動ベクトル
+		Vector3 moveV(0.0f, 0.0f, 0.1f);
+		//今の角度に合わせて移動ベクトルを回転
+		moveV = Vector3::TransformNormal(moveV, m_world_head);
+		//自機の座標を移動
+		m_head_pos += moveV;
+	}
+	//後進
+	if (kb.S)
+	{
+		//移動ベクトル
+		Vector3 moveV(0.0f, 0.0f, -0.1f);
+		//今の角度に合わせて移動ベクトルを回転
+		moveV = Vector3::TransformNormal(moveV, m_world_head);
+		//自機の座標を移動
+		m_head_pos += moveV;
+	}
+
+	//頭パーツの行列の計算
+	//スケーリング行列
+	Matrix h_scalemat = Matrix::CreateScale(1.0f);
+	//ローテーション行列
+	//ロール
+	Matrix h_rotmat_z = Matrix::CreateRotationZ(m_head_vec.z);
+	//ピッチ
+	Matrix h_rotmat_x = Matrix::CreateRotationX(m_head_vec.x);
+	//ヨー
+	Matrix h_rotmat_y = Matrix::CreateRotationY(m_head_vec.y);		
+	//ローテーション行列
+	//ロール
+	Matrix t_rotmat_z = Matrix::CreateRotationZ(0.0f);
+	//ピッチ
+	Matrix t_rotmat_x = Matrix::CreateRotationX(0.0f);
+	//ヨー
+	Matrix t_rotmat_y = Matrix::CreateRotationY(m_radian1 / 100);
+	//ローテーション行列の合成
+	Matrix h_rotmat = h_rotmat_z * h_rotmat_x * h_rotmat_y;
+	//トランスレーション行列
+	Matrix h_transmat = Matrix::CreateTranslation(m_head_pos);
+	//各行列の合成
+	m_world_head = h_scalemat * h_rotmat * h_transmat;
 }
 
 // Draws the scene.
@@ -280,10 +344,13 @@ void Game::Render()
 	}
 
 	//ティーポットを描画
-	for (int i = 0; i < 20; i++)
-	{
-		m_teapot->Draw(m_d3dContext.Get(), *m_states, m_world_teapot[i], m_view, m_proj);
-	}
+	//for (int i = 0; i < 20; i++)
+	//{
+	//	m_teapot->Draw(m_d3dContext.Get(), *m_states, m_world_teapot[i], m_view, m_proj);
+	//}
+
+	//頭パーツを描画
+	m_head->Draw(m_d3dContext.Get(), *m_states, m_world_head, m_view, m_proj);
 
 	m_batch->Begin();
 	//m_batch->DrawLine(
