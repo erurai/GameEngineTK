@@ -13,7 +13,7 @@
 #include "DebugCamera.h"
 #include <Model.h>
 #include <Keyboard.h>
-#include "Camera.h"
+#include "FollowCamera.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -111,6 +111,6 @@ private:
 	DirectX::SimpleMath::Vector3 m_head_pos;
 	DirectX::SimpleMath::Vector3 m_head_vec;
 	std::unique_ptr<DirectX::Keyboard> m_keyboard;
-	std::unique_ptr<Camera> m_camera;
+	std::unique_ptr<FollowCamera> m_camera;
 
 };

@@ -104,7 +104,7 @@ void Game::Initialize(HWND window, int width, int height)
 	m_keyboard = make_unique<Keyboard>();
 
 	//カメラの初期化
-	m_camera = make_unique<Camera>(m_outputWidth,m_outputHeight);
+	m_camera = make_unique<FollowCamera>(m_outputWidth,m_outputHeight);
 
 }
 
@@ -284,8 +284,9 @@ void Game::Update(DX::StepTimer const& timer)
 	//各行列の合成
 	m_world_head = h_scalemat * h_rotmat * h_transmat;
 
-	m_camera->SetEyePos(m_head_pos);
-	m_camera->SetRefPos(m_head_pos);
+	//追従カメラ
+	m_camera->SetTargetPos(m_head_pos);
+	m_camera->SetTargetAngle(m_head_vec.y);
 
 	m_camera->Update();
 	m_view = m_camera->GetViewMatrix();

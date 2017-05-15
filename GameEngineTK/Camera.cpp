@@ -54,7 +54,7 @@ void Camera::Update()
 /// ビュー行列を取得
 /// </summary>
 /// <returns>ビュー行列</returns>
-Matrix Camera::GetViewMatrix()
+const Matrix Camera::GetViewMatrix()
 {
 	return m_view;
 }
@@ -63,7 +63,7 @@ Matrix Camera::GetViewMatrix()
 /// 射影行列を取得
 /// </summary>
 /// <returns>射影行列</returns>
-Matrix Camera::GetProjMatrix()
+const Matrix Camera::GetProjMatrix()
 {
 	return m_proj;
 }
@@ -72,16 +72,16 @@ Matrix Camera::GetProjMatrix()
 /// 視点座標をセット
 /// </summary>
 /// <param name="eyepos">視点座標行列</param>
-void Camera::SetEyePos(Vector3 eyepos)
+void Camera::SetEyePos(const Vector3& eyepos)
 {
-	m_eyepos = eyepos + Vector3(0.0f,2.0f,-4.0f);
+	m_eyepos = eyepos;
 }
 
 /// <summary>
 /// 注視点座標をセット
 /// </summary>
 /// <param name="refpos">注視点座標</param>
-void Camera::SetRefPos(Vector3 refpos)
+void Camera::SetRefPos(const Vector3& refpos)
 {
 	m_refpos = refpos;
 }
@@ -90,7 +90,7 @@ void Camera::SetRefPos(Vector3 refpos)
 /// 上方向ベクトルをセット
 /// </summary>
 /// <param name="upvec">上方向ベクトル</param>
-void Camera::SetUpVec(Vector3 upvec)
+void Camera::SetUpVec(const Vector3& upvec)
 {
 	m_upvec = upvec;
 }
@@ -99,7 +99,7 @@ void Camera::SetUpVec(Vector3 upvec)
 /// 垂直方向視野角をセット
 /// </summary>
 /// <param name="fovY">垂直方向視野角</param>
-void Camera::SetFovY(float fovY)
+void Camera::SetFovY(const float& fovY)
 {
 	m_fovY = fovY;
 }
@@ -108,7 +108,7 @@ void Camera::SetFovY(float fovY)
 /// アスペクト比をセット
 /// </summary>
 /// <param name="aspect">アスペクト比</param>
-void Camera::SetAspect(float aspect)
+void Camera::SetAspect(const float& aspect)
 {
 	m_aspect = aspect;
 }
@@ -117,7 +117,7 @@ void Camera::SetAspect(float aspect)
 /// 手前の表示限界距離をセット
 /// </summary>
 /// <param name="nearclip">手前の表示限界距離</param>
-void Camera::SetNearClip(float nearclip)
+void Camera::SetNearClip(const float& nearclip)
 {
 	m_nearclip = nearclip;
 }
@@ -126,7 +126,7 @@ void Camera::SetNearClip(float nearclip)
 /// 奥の表示限界距離をセット
 /// </summary>
 /// <param name="farclip">奥の表示限界距離</param>
-void Camera::SetFarClip(float farclip)
+void Camera::SetFarClip(const float& farclip)
 {
 	m_farclip = farclip;
 }

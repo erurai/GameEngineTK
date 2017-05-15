@@ -13,18 +13,18 @@ class Camera
 public:
 	Camera(int width, int height);
 	virtual ~Camera();
-	void Update();		//更新
-	DirectX::SimpleMath::Matrix GetViewMatrix();			//ビュー行列を取得
-	DirectX::SimpleMath::Matrix GetProjMatrix();			//射影行列を取得
+	virtual void Update();		//更新
+	const DirectX::SimpleMath::Matrix GetViewMatrix();			//ビュー行列を取得
+	const DirectX::SimpleMath::Matrix GetProjMatrix();			//射影行列を取得
 
-	void SetEyePos(DirectX::SimpleMath::Vector3 eyepos);	//視点座標をセット
-	void SetRefPos(DirectX::SimpleMath::Vector3 refpos);	//注視点をセット
-	void SetUpVec(DirectX::SimpleMath::Vector3 upvec);		//上方向ベクトルをセット
+	void SetEyePos(const DirectX::SimpleMath::Vector3& eyepos);	//視点座標をセット
+	void SetRefPos(const DirectX::SimpleMath::Vector3& refpos);	//注視点をセット
+	void SetUpVec(const DirectX::SimpleMath::Vector3& upvec);		//上方向ベクトルをセット
 
-	void SetFovY(float fovY);								//垂直方向視野角をセット
-	void SetAspect(float aspect);							//アスペクト比をセット
-	void SetNearClip(float nearclip);						//手前の表示限界距離をセット
-	void SetFarClip(float farclip);							//奥の表示限界距離をセット
+	void SetFovY(const float& fovY);								//垂直方向視野角をセット
+	void SetAspect(const float& aspect);							//アスペクト比をセット
+	void SetNearClip(const float& nearclip);						//手前の表示限界距離をセット
+	void SetFarClip(const float& farclip);							//奥の表示限界距離をセット
 
 protected:
 	DirectX::SimpleMath::Matrix m_view;						//ビュー行列
