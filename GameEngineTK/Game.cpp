@@ -105,6 +105,7 @@ void Game::Initialize(HWND window, int width, int height)
 
 	//ƒJƒƒ‰‚Ì‰Šú‰»
 	m_camera = make_unique<FollowCamera>(m_outputWidth,m_outputHeight);
+	m_camera->SetKeyboard(m_keyboard.get());
 
 }
 
