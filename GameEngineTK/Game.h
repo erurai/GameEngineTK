@@ -14,12 +14,25 @@
 #include <Model.h>
 #include <Keyboard.h>
 #include "FollowCamera.h"
+#include "Obj3d.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
 class Game
 {
 public:
+
+	enum PLAYER_PARTS
+	{
+		PLAYER_PARTS_TANK,	//足
+		PLAYER_PARTS_BASE,	//基底
+		PLAYER_PARTS_HEAD,	//頭
+		PLAYER_PARTS_ARM,	//腕
+		PLAYER_PARTS_GUN,	//銃
+		PLAYER_PARTS_SHELD,	//盾
+
+		PLAYER_PARTS_NUM
+	};
 
     Game();
 
@@ -84,21 +97,18 @@ private:
 
 	std::unique_ptr<DirectX::EffectFactory> m_factory;
 
-	std::unique_ptr<DirectX::Model> m_sky_dome;
-	std::unique_ptr<DirectX::Model> m_ground;
 	std::unique_ptr<DirectX::Model> m_ball;
 	std::unique_ptr<DirectX::Model> m_teapot;
-	std::unique_ptr<DirectX::Model> m_head;
+
+	Obj3d m_objSkydome;
+	Obj3d m_objGround;
+	std::vector<Obj3d> m_objPlayer;
 
 	//球のワールド行列
 	DirectX::SimpleMath::Matrix m_world_ball[20];
-	//ティーポットのワールド行列
-	DirectX::SimpleMath::Matrix m_world_teapot[20];
-	//頭パーツのワールド行列
+	//自機のワールド行列
 	DirectX::SimpleMath::Matrix m_world_head;
-
-	float m_scale;		//大きさ
-	bool m_scale_flag;	//大きさを増減させるフラグ
+	DirectX::SimpleMath::Matrix m_world_head2;
 
 	float m_radian1;	//角度
 	float m_radian2;	//逆回転させる角度
