@@ -15,24 +15,14 @@
 #include <Keyboard.h>
 #include "FollowCamera.h"
 #include "Obj3d.h"
+#include "Player.h"
+#include "Enemy.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
 class Game
 {
 public:
-
-	enum PLAYER_PARTS
-	{
-		PLAYER_PARTS_TANK,	//足
-		PLAYER_PARTS_BASE,	//基底
-		PLAYER_PARTS_HEAD,	//頭
-		PLAYER_PARTS_ARM,	//腕
-		PLAYER_PARTS_GUN,	//銃
-		PLAYER_PARTS_SHELD,	//盾
-
-		PLAYER_PARTS_NUM
-	};
 
     Game();
 
@@ -51,6 +41,9 @@ public:
 
     // Properties
     void GetDefaultSize( int& width, int& height ) const;
+
+	//std::unique_ptr<DirectX::Keyboard>& GetKeyBoard() { return m_keyboard; }
+	//std::unique_ptr<DirectX::Keyboard::KeyboardStateTracker>& GetKeyTracker() { return m_keytracker; }
 
 private:
 
@@ -102,7 +95,9 @@ private:
 
 	Obj3d m_objSkydome;
 	Obj3d m_objGround;
-	std::vector<Obj3d> m_objPlayer;
+
+	std::unique_ptr<Player> m_player;	//プレイヤー
+	std::vector<std::unique_ptr<Enemy>> m_enemis; //敵
 
 	//球のワールド行列
 	DirectX::SimpleMath::Matrix m_world_ball[20];
@@ -118,9 +113,9 @@ private:
 
 	float m_time;
 
-	DirectX::SimpleMath::Vector3 m_head_pos;
-	DirectX::SimpleMath::Vector3 m_head_vec;
 	std::unique_ptr<DirectX::Keyboard> m_keyboard;
 	std::unique_ptr<FollowCamera> m_camera;
+
+	//std::unique_ptr<DirectX::Keyboard::KeyboardStateTracker> m_keytracker;
 
 };

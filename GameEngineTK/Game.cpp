@@ -103,16 +103,17 @@ void Game::Initialize(HWND window, int width, int height)
 		m_pos_z[i] = rand() % 200 - 100;
 	}
 
-	//時間の初期化
-	m_time = 0.0f;
+	m_player = make_unique<Player>(m_keyboard.get());
+	//敵の生成
+	int enemy_num = rand() % 10 + 1;
+	m_enemis.resize(enemy_num);
+	for (int i = 0; i < enemy_num; i++)
+	{
+		m_enemis[i] = make_unique<Enemy>();
+	}
 
-	m_objPlayer.resize(PLAYER_PARTS_NUM);
-	m_objPlayer[PLAYER_PARTS_TANK].LoadModel(L"Resources/tank.cmo");
-	m_objPlayer[PLAYER_PARTS_BASE].LoadModel(L"Resources/base.cmo");
-	m_objPlayer[PLAYER_PARTS_HEAD].LoadModel(L"Resources/head.cmo");
-	m_objPlayer[PLAYER_PARTS_ARM].LoadModel(L"Resources/arm.cmo");
-	m_objPlayer[PLAYER_PARTS_GUN].LoadModel(L"Resources/gun.cmo");
-	m_objPlayer[PLAYER_PARTS_SHELD].LoadModel(L"Resources/sheld.cmo");
+	//時間の初期化
+	m_time = 80.0f;
 
 }
 
@@ -194,67 +195,12 @@ void Game::Update(DX::StepTimer const& timer)
 
 	//キーボードの状態を取得
 	Keyboard::State kb = m_keyboard->GetState();
-
-	//左旋回
-	if (kb.A)
-	{
-		//自機の方向を旋回
-		m_head_vec.y += 0.03f;
-	}
-	//右旋回
-	if (kb.D)
-	{
-		//自機の方向を旋回
-		m_head_vec.y -= 0.03f;
-	}
-	//前進
-	if (kb.W)
-	{
-		//移動ベクトル
-		Vector3 moveV(0.0f, 0.0f, 0.1f);
-		//今の角度に合わせて移動ベクトルを回転
-		moveV = Vector3::TransformNormal(moveV, m_world_head);
-		//自機の座標を移動
-		m_head_pos += moveV;
-	}
-	//後進
-	if (kb.S)
-	{
-		//移動ベクトル
-		Vector3 moveV(0.0f, 0.0f, -0.1f);
-		//今の角度に合わせて移動ベクトルを回転
-		moveV = Vector3::TransformNormal(moveV, m_world_head);
-		//自機の座標を移動
-		m_head_pos += moveV;
-	}
-
-	{
-		////頭パーツの行列の計算
-		////スケーリング行列
-		//Matrix h_scalemat = Matrix::CreateScale(1.0f);
-		////ローテーション行列
-		////ロール
-		//Matrix h_rotmat_z = Matrix::CreateRotationZ(m_head_vec.z);
-		////ピッチ
-		//Matrix h_rotmat_x = Matrix::CreateRotationX(m_head_vec.x);
-		////ヨー
-		//Matrix h_rotmat_y = Matrix::CreateRotationY(m_head_vec.y);		
-		////ローテーション行列の合成
-		//Matrix h_rotmat = h_rotmat_z * h_rotmat_x * h_rotmat_y;
-		////トランスレーション行列
-		//Matrix h_transmat = Matrix::CreateTranslation(m_head_pos);
-		////各行列の合成
-		//m_world_head = h_scalemat * h_rotmat * h_transmat;
-	}
-
-	//自機のパーツ２を計算
-	//トランスレーション行列
-	//Matrix h_transmat2 = Matrix::CreateTranslation(Vector3(0.0f,0.5f,0.0f));
-	//m_world_head2 = h_transmat2 * m_world_head;
+	//auto state = m_keyboard->GetState();
+	//m_keytracker->Update(state);
 
 	//追従カメラ
-	m_camera->SetTargetPos(m_head_pos);
-	m_camera->SetTargetAngle(m_head_vec.y);
+	m_camera->SetTargetPos(m_player->GetPlayerPos());
+	m_camera->SetTargetAngle(m_player->GetPlayerAngle().y);
 
 	m_camera->Update();
 	m_view = m_camera->GetViewMatrix();
@@ -262,10 +208,14 @@ void Game::Update(DX::StepTimer const& timer)
 
 	m_objSkydome.Update();
 	m_objGround.Update();
-
-	for (vector<Obj3d>::iterator it = m_objPlayer.begin(); it != m_objPlayer.end(); it++)
+	//プレイヤーの更新
+	m_player->Update();
+	//敵の更新
+	for (std::vector<std::unique_ptr<Enemy>>::iterator it = m_enemis.begin(); it != m_enemis.end(); it++)
 	{
-		it->Update();
+		//Enemy* enemy = it->get();
+		//enemy->Update();
+		(*it)->Update();
 	}
 }
 
@@ -352,12 +302,14 @@ void Game::Render()
 		m_ball->Draw(m_d3dContext.Get(), *m_states, m_world_ball[i], m_view, m_proj);
 	}
 
-	//頭パーツを描画
-	//m_head->Draw(m_d3dContext.Get(), *m_states, m_world_head, m_view, m_proj);
-	//m_head->Draw(m_d3dContext.Get(), *m_states, m_world_head2, m_view, m_proj);
-	for (vector<Obj3d>::iterator it = m_objPlayer.begin(); it != m_objPlayer.end(); it++)
+	//プレイヤーの描画
+	m_player->Render();
+	//敵の描画
+	for (std::vector<std::unique_ptr<Enemy>>::iterator it = m_enemis.begin(); it != m_enemis.end(); it++)
 	{
-		it->Draw();
+		//Enemy* enemy = it->get();
+		//enemy->Render();
+		(*it)->Render();
 	}
 
 	m_batch->Begin();
