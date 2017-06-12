@@ -53,6 +53,8 @@ Player::Player(Keyboard* keyboard)
 	m_weapon_pos = m_objPlayer[PLAYER_PARTS_GUN].GetTransration();
 	m_transform_flag = false;
 	m_translate_flag = false;
+	m_fireflag = false;
+	m_firetime = 0;
 }
 
 /// <summary>
@@ -119,7 +121,7 @@ void Player::Update()
 		m_objPlayer[PLAYER_PARTS_TANK].SetTransration(pos);
 	}
 
-	if (m_keystate.Space && (m_weapon_angle == 550.0f || m_weapon_angle == 1120.0f))
+	if (m_keystate.Z && (m_weapon_angle == 550.0f || m_weapon_angle == 1120.0f))
 	{
 		if (m_transform_flag == false)
 		{
@@ -131,6 +133,12 @@ void Player::Update()
 		}
 	}
 
+	//キーを押して発射
+	if (m_keystate.Space)
+	{
+		BulletFire();
+	}
+
 	if (m_transform_flag == true && m_weapon_angle > 550.0f)
 	{
 		TransformParts();
@@ -138,6 +146,21 @@ void Player::Update()
 	if (m_transform_flag == false && m_weapon_angle < 1120.0f)
 	{
 		RetrunParts();
+	}
+
+	if(m_fireflag == true)
+	{
+		//自機の座標を移動
+		Vector3 pos = m_objPlayer[PLAYER_PARTS_GUN].GetTransration();
+		pos += m_bulletvec;
+		m_objPlayer[PLAYER_PARTS_GUN].SetTransration(pos);
+
+		m_firetime++;
+		if (m_firetime >= 120)
+		{
+			m_firetime = 0;
+			ResetBullet();
+		}
 	}
 
 	for (vector<Obj3d>::iterator it = m_objPlayer.begin(); it != m_objPlayer.end(); it++)
@@ -174,4 +197,54 @@ void Player::RetrunParts()
 {
 	m_weapon_angle += 10.0f;
 	m_objPlayer[PLAYER_PARTS_ARM].SetRotation(Vector3(m_weapon_angle / 360.0f, 0.0f, 0.0f));
+}
+
+/// <summary>
+/// パーツを発射
+/// </summary>
+void Player::BulletFire()
+{
+	//既に発射中
+	if (m_fireflag) return;
+
+	//親子関係を加味したワールド座標を取得
+	Matrix worldm = m_objPlayer[PLAYER_PARTS_GUN].GetWorld();
+
+	Vector3 scale;
+	Quaternion rotation;
+	Vector3 transration;
+
+	//ワールド行列から各要素を取り出す
+	worldm.Decompose(scale, rotation, transration);
+
+	//親子関係を解除してパーツを独立させる
+	m_objPlayer[PLAYER_PARTS_GUN].SetParentObj(nullptr);
+	m_objPlayer[PLAYER_PARTS_GUN].SetScale(scale);
+	m_objPlayer[PLAYER_PARTS_GUN].SetRotationQ(rotation);
+	m_objPlayer[PLAYER_PARTS_GUN].SetTransration(transration);
+
+	//発射する弾丸の速度ベクトル
+	m_bulletvec = Vector3(0.0f, 0.0f, -0.5f);
+	//ベクトルをクォータニオンで回転
+	m_bulletvec = Vector3::Transform(m_bulletvec, rotation);
+
+	m_fireflag = true;
+
+}
+
+/// <summary>
+/// 発射したパーツを戻す
+/// </summary>
+void Player::ResetBullet()
+{
+	//発射中ではない
+	if (!m_fireflag) return;
+
+	//パーツを戻す
+	m_objPlayer[PLAYER_PARTS_GUN].SetParentObj(&m_objPlayer[PLAYER_PARTS_ARM]);
+
+	m_objPlayer[PLAYER_PARTS_GUN].SetTransration(Vector3(0.0f, 0.0f, 0.0f));
+	m_objPlayer[PLAYER_PARTS_GUN].SetRotation(Vector3(550.0f / 360.0f, 0.0f, 0.0f));
+
+	m_fireflag = false;
 }

@@ -41,11 +41,13 @@ public:
 	void LoadModel(const wchar_t* szFileName);							//モデルの読み込み
 
 	//setter
-	void SetScale(const DirectX::SimpleMath::Vector3 scale)
+	void SetScale(const DirectX::SimpleMath::Vector3& scale)
 	{ m_scale = scale; }												//スケーリング用
-	void SetRotation(const DirectX::SimpleMath::Vector3 rotation)
-	{ m_rotation = rotation; }											//回転角用
-	void SetTransration(const DirectX::SimpleMath::Vector3 transration)
+	void SetRotation(const DirectX::SimpleMath::Vector3& rotation)
+	{ m_rotation = rotation; m_use_quternion = false; }					//オイラー角回転角用
+	void SetRotationQ(const DirectX::SimpleMath::Quaternion& quaternion)
+	{ m_rotationQ = quaternion; m_use_quternion = true; }				//クォータニオン回転角用
+	void SetTransration(const DirectX::SimpleMath::Vector3& transration)
 	{ m_transration = transration; }									//平行移動用
 	void SetParentObj(Obj3d* pParent_obj)
 	{ m_pParent_obj = pParent_obj; }									//親行列用
@@ -65,9 +67,11 @@ public:
 private:
 	std::unique_ptr<DirectX::Model> m_model;							//モデルのユニークポインタ
 	DirectX::SimpleMath::Vector3 m_scale;								//スケーリング行列
-	DirectX::SimpleMath::Vector3 m_rotation;							//回転角行列
+	DirectX::SimpleMath::Vector3 m_rotation;							//回転角行列(オイラー角)
 	DirectX::SimpleMath::Vector3 m_transration;							//平行移動行列
 	DirectX::SimpleMath::Matrix m_world;								//ワールド行列
+	bool m_use_quternion;												//クォータニオンを使うかどうか
+	DirectX::SimpleMath::Quaternion m_rotationQ;						//回転角(クォータニオン)
 	Obj3d* m_pParent_obj;												//親となる3Dオブジェクトのポインタ
 
 };

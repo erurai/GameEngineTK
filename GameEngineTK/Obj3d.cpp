@@ -35,6 +35,7 @@ Obj3d::Obj3d()
 	m_scale = Vector3(1.0f, 1.0f, 1.0f);
 
 	m_pParent_obj = nullptr;
+	m_use_quternion = false;
 }
 
 void Obj3d::Update()
@@ -43,14 +44,22 @@ void Obj3d::Update()
 	//スケーリング行列
 	Matrix scalemat = Matrix::CreateScale(m_scale);
 	//ローテーション行列
-	//ロール
-	Matrix rotmat_z = Matrix::CreateRotationZ(m_rotation.z);
-	//ピッチ
-	Matrix rotmat_x = Matrix::CreateRotationX(m_rotation.x);
-	//ヨー
-	Matrix rotmat_y = Matrix::CreateRotationY(m_rotation.y);
-	//ローテーション行列の合成
-	Matrix rotmat = rotmat_z * rotmat_x * rotmat_y;
+	Matrix rotmat;
+	if (m_use_quternion)
+	{//クォータニオン計算
+		rotmat = Matrix::CreateFromQuaternion(m_rotationQ);
+	}
+	else
+	{//オイラー計算
+		//ロール
+		Matrix rotmat_z = Matrix::CreateRotationZ(m_rotation.z);
+		//ピッチ
+		Matrix rotmat_x = Matrix::CreateRotationX(m_rotation.x);
+		//ヨー
+		Matrix rotmat_y = Matrix::CreateRotationY(m_rotation.y);
+		//ローテーション行列の合成
+		rotmat = rotmat_z * rotmat_x * rotmat_y;
+	}
 	//トランスレーション行列
 	Matrix transmat = Matrix::CreateTranslation(m_transration);
 	//各行列の合成

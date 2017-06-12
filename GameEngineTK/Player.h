@@ -29,6 +29,8 @@ public:
 
 	void Update();
 	void Render();
+	void BulletFire();
+	void ResetBullet();
 
 	const DirectX::SimpleMath::Vector3& GetPlayerPos() { return m_objPlayer[PLAYER_PARTS_TANK].GetTransration(); }
 	const DirectX::SimpleMath::Vector3& GetPlayerAngle() { return m_objPlayer[PLAYER_PARTS_TANK].GetRotation(); }
@@ -42,6 +44,9 @@ private:
 	bool m_transform_flag;
 	DirectX::SimpleMath::Vector3 m_weapon_pos;
 	bool m_translate_flag;
+	bool m_fireflag;
+	DirectX::SimpleMath::Vector3 m_bulletvec;
+	int m_firetime;
 
 	DirectX::Keyboard* m_keyboard;
 	DirectX::Keyboard::State m_keystate;
