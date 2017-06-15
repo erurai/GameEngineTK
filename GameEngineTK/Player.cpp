@@ -206,6 +206,7 @@ void Player::BulletFire()
 {
 	//既に発射中
 	if (m_fireflag) return;
+	if (!m_transform_flag) return;
 
 	//親子関係を加味したワールド座標を取得
 	Matrix worldm = m_objPlayer[PLAYER_PARTS_GUN].GetWorld();
