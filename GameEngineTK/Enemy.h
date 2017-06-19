@@ -7,6 +7,7 @@
 #include "Obj3d.h"
 #include <SimpleMath.h>
 #include <Keyboard.h>
+#include "CollisionNode.h"
 
 class Enemy
 {
@@ -32,6 +33,7 @@ public:
 
 	const DirectX::SimpleMath::Vector3& GetEnemyPos() { return m_objEnemy[ENEMY_PARTS_TANK].GetTransration(); }
 	const DirectX::SimpleMath::Vector3& GetEnemyAngle() { return m_objEnemy[ENEMY_PARTS_TANK].GetRotation(); }
+	const SphereNode& GetCollisionNodeBullet() { return m_collisionnode; }
 
 private:
 	std::vector<Obj3d> m_objEnemy;
@@ -47,4 +49,6 @@ private:
 	bool m_accel;
 	int m_time;
 	float m_dist_angle;
+
+	SphereNode m_collisionnode;	//ìñÇΩÇËîªíËÉmÅ[Éh
 };

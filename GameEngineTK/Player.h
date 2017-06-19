@@ -7,6 +7,7 @@
 #include "Obj3d.h"
 #include <SimpleMath.h>
 #include <Keyboard.h>
+#include "CollisionNode.h"
 
 class Player
 {
@@ -34,6 +35,7 @@ public:
 
 	const DirectX::SimpleMath::Vector3& GetPlayerPos() { return m_objPlayer[PLAYER_PARTS_TANK].GetTransration(); }
 	const DirectX::SimpleMath::Vector3& GetPlayerAngle() { return m_objPlayer[PLAYER_PARTS_TANK].GetRotation(); }
+	const SphereNode& GetCollisionNodeBullet() { return m_collisionnode_bullet; }
 
 private:
 	std::vector<Obj3d> m_objPlayer;
@@ -47,6 +49,8 @@ private:
 	bool m_fireflag;
 	DirectX::SimpleMath::Vector3 m_bulletvec;
 	int m_firetime;
+
+	SphereNode m_collisionnode_bullet;	//ìñÇΩÇËîªíËÉmÅ[Éh
 
 	DirectX::Keyboard* m_keyboard;
 	DirectX::Keyboard::State m_keystate;

@@ -59,6 +59,15 @@ Enemy::Enemy()
 	m_accel = true;
 	m_time = 60;
 	m_dist_angle = 0.0f;
+
+	//当たり判定ノードの設定
+	m_collisionnode.Initialize();
+	//パーツにぶら下げる
+	m_collisionnode.SetObjParent(&m_objEnemy[ENEMY_PARTS_BASE]);
+	//パーツからのオフセット
+	m_collisionnode.SetTrans(Vector3(0.0f, 0.5f, 0.0f));
+	//当たり判定の半径
+	m_collisionnode.SetLocalRadius(1.0f);
 }
 
 /// <summary>
@@ -83,6 +92,8 @@ void Enemy::Update()
 		it->Update();
 	}
 
+	m_collisionnode.Update();
+
 }
 
 /// <summary>
@@ -94,6 +105,8 @@ void Enemy::Render()
 	{
 		it->Draw();
 	}
+
+	m_collisionnode.Draw();
 }
 
 /// <summary>

@@ -55,6 +55,15 @@ Player::Player(Keyboard* keyboard)
 	m_translate_flag = false;
 	m_fireflag = false;
 	m_firetime = 0;
+
+	//当たり判定ノードの設定
+	m_collisionnode_bullet.Initialize();
+	//武器パーツにぶら下げる
+	m_collisionnode_bullet.SetObjParent(&m_objPlayer[PLAYER_PARTS_GUN]);
+	//武器パーツからのオフセット
+	m_collisionnode_bullet.SetTrans(Vector3(0.0f, 0.0f, 0.0f));
+	//当たり判定の半径
+	m_collisionnode_bullet.SetLocalRadius(0.2f);
 }
 
 /// <summary>
@@ -168,6 +177,9 @@ void Player::Update()
 		it->Update();
 	}
 
+	//当たり判定ノードの更新
+	m_collisionnode_bullet.Update();
+
 }
 
 /// <summary>
@@ -179,6 +191,8 @@ void Player::Render()
 	{
 		it->Draw();
 	}
+
+	m_collisionnode_bullet.Draw();
 }
 
 /// <summary>
