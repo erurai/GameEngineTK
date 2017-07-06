@@ -173,7 +173,7 @@ void Enemy::MoveAI()
 	{
 		angle += XM_2PI;
 	}
-	rot.y += angle * 0.02;
+	rot.y += angle * 0.02f;
 
 	//“G‚ÌŠp“x‚ğ•ÏX
 	m_objEnemy[ENEMY_PARTS_TANK].SetRotation(Vector3(0.0f, rot.y, 0.0f));

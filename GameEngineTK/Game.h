@@ -17,6 +17,7 @@
 #include "Obj3d.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "LandShape.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -94,7 +95,8 @@ private:
 	std::unique_ptr<DirectX::Model> m_teapot;
 
 	Obj3d m_objSkydome;
-	Obj3d m_objGround;
+	//Obj3d m_objGround;
+	LandShape m_LandShape;
 
 	std::unique_ptr<Player> m_player;	//ÉvÉåÉCÉÑÅ[
 	std::vector<std::unique_ptr<Enemy>> m_enemis; //ìG

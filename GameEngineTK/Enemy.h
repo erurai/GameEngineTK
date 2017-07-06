@@ -33,7 +33,7 @@ public:
 
 	const DirectX::SimpleMath::Vector3& GetEnemyPos() { return m_objEnemy[ENEMY_PARTS_TANK].GetTransration(); }
 	const DirectX::SimpleMath::Vector3& GetEnemyAngle() { return m_objEnemy[ENEMY_PARTS_TANK].GetRotation(); }
-	const SphereNode& GetCollisionNodeBullet() { return m_collisionnode; }
+	const SphereNode& GetCollisionNodeBody() { return m_collisionnode; }
 
 private:
 	std::vector<Obj3d> m_objEnemy;

@@ -49,6 +49,8 @@ public:
 	{ m_rotationQ = quaternion; m_use_quternion = true; }				//クォータニオン回転角用
 	void SetTransration(const DirectX::SimpleMath::Vector3& transration)
 	{ m_transration = transration; }									//平行移動用
+	void SetWorld(const DirectX::SimpleMath::Matrix& world)
+	{ m_world = world; }												//ワールド行列用
 	void SetParentObj(Obj3d* pParent_obj)
 	{ m_pParent_obj = pParent_obj; }									//親行列用
 

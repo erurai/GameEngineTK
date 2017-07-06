@@ -17,6 +17,15 @@ Player::Player(Keyboard* keyboard)
 {
 	//キーボードの初期化
 	m_keyboard = keyboard;
+	// KeyboardStateTrackerオブジェクトを生成する Create KeyboardStateTracker object
+	this->m_keyboard_tracker = make_unique<Keyboard::KeyboardStateTracker>();
+
+	// 状態を初期化する
+	Standing::GetInstance()->Initialize(unique_ptr<Player>(this));
+	Shot::GetInstance()->Initialize(unique_ptr<Player>(this));
+
+	// 現在の状態を「立ち」に設定する
+	ChangeState(Standing::GetInstance());
 
 	//自機パーツの読み込み
 	m_objPlayer.resize(PLAYER_PARTS_NUM);
@@ -44,17 +53,21 @@ Player::Player(Keyboard* keyboard)
 	m_objPlayer[PLAYER_PARTS_HEAD].SetTransration(Vector3(0.1f, 0.07f, 0.55f));
 
 	m_objPlayer[PLAYER_PARTS_ARM].SetTransration(Vector3(-0.3f, -0.1f, 0.25f));
-	m_objPlayer[PLAYER_PARTS_ARM].SetRotation(Vector3(1120.0f / 360.0f, 0.0f, 0.0f));
+	m_objPlayer[PLAYER_PARTS_ARM].SetRotation(Vector3(XMConvertToRadians(180.0f), 0.0f, 0.0f));
+	//m_objPlayer[PLAYER_PARTS_ARM].SetRotation(Vector3(1120.0f / 360.0f, 0.0f, 0.0f));
 
 	m_objPlayer[PLAYER_PARTS_GUN].SetTransration(Vector3(0.0f, 0.0f, 0.0f));
-	m_objPlayer[PLAYER_PARTS_GUN].SetRotation(Vector3(550.0f / 360.0f, 0.0f, 0.0f));
+	m_objPlayer[PLAYER_PARTS_GUN].SetRotation(Vector3(XMConvertToRadians(90.0f), 0.0f, 0.0f));
+	//m_objPlayer[PLAYER_PARTS_GUN].SetRotation(Vector3(550.0f / 360.0f, 0.0f, 0.0f));
 
-	m_weapon_angle = 1120.0f;
+	m_weapon_angle = 180.0f;
 	m_weapon_pos = m_objPlayer[PLAYER_PARTS_GUN].GetTransration();
 	m_transform_flag = false;
 	m_translate_flag = false;
 	m_fireflag = false;
 	m_firetime = 0;
+	m_speed = 0.1f;
+	m_anglespeed = 0.03f;
 
 	//当たり判定ノードの設定
 	m_collisionnode_bullet.Initialize();
@@ -81,28 +94,38 @@ void Player::Update()
 {
 	//キーボードの状態を取得
 	m_keystate = m_keyboard->GetState();
-	//auto state = m_keyboard->GetState();
-	//m_keytracker->Update(state);
+	m_keyboard_tracker->Update(m_keystate);
+
+	float minangle = 90.0f;
+	float maxangle = 180.0f;
 
 	//左旋回
 	if (m_keystate.A)
 	{
 		//自機の方向を旋回
 		float angle = m_objPlayer[PLAYER_PARTS_TANK].GetRotation().y;
-		m_objPlayer[PLAYER_PARTS_TANK].SetRotation(Vector3(0.0f, angle + 0.03f, 0.0f));
+		m_objPlayer[PLAYER_PARTS_TANK].SetRotation(Vector3(0.0f, angle + m_anglespeed, 0.0f));
+		if (m_keystate.O && m_anglespeed <= 0.03f && m_keystate.W == false && m_keystate.S == false)
+		{
+			m_anglespeed = 0.2f;
+		}
 	}
 	//右旋回
 	if (m_keystate.D)
 	{
 		//自機の方向を旋回
 		float angle = m_objPlayer[PLAYER_PARTS_TANK].GetRotation().y;
-		m_objPlayer[PLAYER_PARTS_TANK].SetRotation(Vector3(0.0f, angle - 0.03f, 0.0f));
+		m_objPlayer[PLAYER_PARTS_TANK].SetRotation(Vector3(0.0f, angle - m_anglespeed, 0.0f));
+		if (m_keystate.O && m_anglespeed <= 0.03f && m_keystate.W == false && m_keystate.S == false)
+		{
+			m_anglespeed = 0.2f;
+		}
 	}
 	//前進
 	if (m_keystate.W)
 	{
 		//移動ベクトル
-		Vector3 moveV(0.0f, 0.0f, 0.1f);
+		Vector3 moveV(0.0f, 0.0f, m_speed);
 		//今の角度に合わせて移動ベクトルを回転
 		//回転行列
 		float angle = m_objPlayer[PLAYER_PARTS_TANK].GetRotation().y;
@@ -112,13 +135,18 @@ void Player::Update()
 		Vector3 pos = m_objPlayer[PLAYER_PARTS_TANK].GetTransration();
 		pos += moveV;
 		m_objPlayer[PLAYER_PARTS_TANK].SetTransration(pos);
+
+		if (m_keystate.O && m_speed <= 0.1f)
+		{
+			m_speed = 0.5f;
+		}
 
 	}
 	//後進
 	if (m_keystate.S)
 	{
 		//移動ベクトル
-		Vector3 moveV(0.0f, 0.0f, -0.1f);
+		Vector3 moveV(0.0f, 0.0f, -m_speed);
 		//今の角度に合わせて移動ベクトルを回転
 		//回転行列
 		float angle = m_objPlayer[PLAYER_PARTS_TANK].GetRotation().y;
@@ -128,9 +156,17 @@ void Player::Update()
 		Vector3 pos = m_objPlayer[PLAYER_PARTS_TANK].GetTransration();
 		pos += moveV;
 		m_objPlayer[PLAYER_PARTS_TANK].SetTransration(pos);
+
+		if (m_keystate.O && m_speed <= 0.1f)
+		{
+			m_speed = 0.4f;
+		}
 	}
 
-	if (m_keystate.Z && (m_weapon_angle == 550.0f || m_weapon_angle == 1120.0f))
+	if (m_speed > 0.1f){ m_speed -= 0.01f; }
+	if (m_anglespeed > 0.03f) { m_anglespeed -= 0.005f; }
+
+	if (m_keyboard_tracker->IsKeyPressed(Keyboard::Keys::E))
 	{
 		if (m_transform_flag == false)
 		{
@@ -148,11 +184,11 @@ void Player::Update()
 		BulletFire();
 	}
 
-	if (m_transform_flag == true && m_weapon_angle > 550.0f)
+	if (m_transform_flag == true && m_weapon_angle > minangle)
 	{
 		TransformParts();
 	}
-	if (m_transform_flag == false && m_weapon_angle < 1120.0f)
+	if (m_transform_flag == false && m_weapon_angle < maxangle)
 	{
 		RetrunParts();
 	}
@@ -171,6 +207,9 @@ void Player::Update()
 			ResetBullet();
 		}
 	}
+
+	//状態の更新
+	this->currentState->Execute();
 
 	for (vector<Obj3d>::iterator it = m_objPlayer.begin(); it != m_objPlayer.end(); it++)
 	{
@@ -196,12 +235,21 @@ void Player::Render()
 }
 
 /// <summary>
+/// 状態を変更する
+/// </summary>
+/// <param name="currentState">変更する状態</param>
+void Player::ChangeState(std::shared_ptr<State> currentState)
+{
+	this->currentState = currentState;
+}
+
+/// <summary>
 /// パーツの変形(？)
 /// </summary>
 void Player::TransformParts()
 {
-	m_weapon_angle -= 10.0f;
-	m_objPlayer[PLAYER_PARTS_ARM].SetRotation(Vector3(m_weapon_angle / 360.0f, 0.0f, 0.0f));
+	m_weapon_angle -= 1.0f;
+	m_objPlayer[PLAYER_PARTS_ARM].SetRotation(Vector3(XMConvertToRadians(m_weapon_angle), 0.0f, 0.0f));
 }
 
 /// <summary>
@@ -209,8 +257,8 @@ void Player::TransformParts()
 /// </summary>
 void Player::RetrunParts()
 {
-	m_weapon_angle += 10.0f;
-	m_objPlayer[PLAYER_PARTS_ARM].SetRotation(Vector3(m_weapon_angle / 360.0f, 0.0f, 0.0f));
+	m_weapon_angle += 1.0f;
+	m_objPlayer[PLAYER_PARTS_ARM].SetRotation(Vector3(XMConvertToRadians(m_weapon_angle), 0.0f, 0.0f));
 }
 
 /// <summary>
@@ -259,7 +307,7 @@ void Player::ResetBullet()
 	m_objPlayer[PLAYER_PARTS_GUN].SetParentObj(&m_objPlayer[PLAYER_PARTS_ARM]);
 
 	m_objPlayer[PLAYER_PARTS_GUN].SetTransration(Vector3(0.0f, 0.0f, 0.0f));
-	m_objPlayer[PLAYER_PARTS_GUN].SetRotation(Vector3(550.0f / 360.0f, 0.0f, 0.0f));
+	m_objPlayer[PLAYER_PARTS_GUN].SetRotation(Vector3(XMConvertToRadians(90.0f), 0.0f, 0.0f));
 
 	m_fireflag = false;
 }

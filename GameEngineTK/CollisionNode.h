@@ -8,6 +8,12 @@
 class CollisionNode
 {
 public:
+	static bool GetDebugVisible() { return m_debug_visible; }
+	static void SetDebugVisible(bool visible) { m_debug_visible = visible; }
+protected:
+	static bool m_debug_visible;				//デバッグ表示ON
+
+public:
 	virtual void Initialize() = 0;			//初期化
 	virtual void Update() = 0;				//毎フレーム更新
 	virtual void Draw() = 0;				//描画

@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "Game.h"
 #include "Obj3d.h"
+#include "ModelEffect.h"
 
 extern void ExitGame();
 
@@ -59,6 +60,14 @@ void Game::Initialize(HWND window, int width, int height)
 	//3Dオブジェクトクラスの静的メンバを初期化
 	Obj3d::InitializeStatic(m_camera.get(), m_d3dDevice, m_d3dContext);
 
+	//地形の初期化に必要な設定
+	LandShapeCommonDef lscDef;
+	lscDef.pDevice = m_d3dDevice.Get();
+	lscDef.pDeviceContext = m_d3dContext.Get();
+	lscDef.pCamera = m_camera.get();
+	//地形の共通初期化
+	LandShape::InitializeCommon(lscDef);
+
 	m_batch = make_unique<PrimitiveBatch<VertexPositionNormal>>(m_d3dContext.Get());
 
 	m_effect = make_unique<BasicEffect>(m_d3dDevice.Get());
@@ -88,7 +97,8 @@ void Game::Initialize(HWND window, int width, int height)
 
 	//モデルの読み込み
 	m_objSkydome.LoadModel(L"Resources/SkyDome.cmo");
-	m_objGround.LoadModel( L"Resources/Ground_200M.cmo");
+	//m_objGround.LoadModel( L"Resources/Ground_200M.cmo");
+	m_LandShape.Initialize(L"Ground_200M", L"Ground_200M");
 	m_ball = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/Ball.cmo", *m_factory);
 	m_teapot = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/Teapot.cmo", *m_factory);
 
@@ -207,7 +217,8 @@ void Game::Update(DX::StepTimer const& timer)
 	m_proj = m_camera->GetProjMatrix();
 
 	m_objSkydome.Update();
-	m_objGround.Update();
+	//m_objGround.Update();
+	m_LandShape.Update();
 	//プレイヤーの更新
 	m_player->Update();
 	//敵の更新
@@ -217,6 +228,38 @@ void Game::Update(DX::StepTimer const& timer)
 		//enemy->Update();
 		(*it)->Update();
 	}
+
+	//弾丸と敵の当たり判定
+	const Sphere& bullet_sphere = m_player->GetCollisionNodeBullet();
+	//敵の数だけ処理する
+	for (std::vector<std::unique_ptr<Enemy>>::iterator it = m_enemis.begin(); it != m_enemis.end();)
+	{
+		Enemy* enemy = it->get();
+		const Sphere& enemy_sphere = enemy->GetCollisionNodeBody();
+
+		if (CheckSphere2Sphere(bullet_sphere, enemy_sphere))
+		{
+			ModelEffectManager::getInstance()->Entry(
+				L"Resources/HitEffect.cmo",	// モデルファイル
+				10,	// 寿命フレーム数
+				enemy->GetEnemyPos() + Vector3(0.0f,1.0f,0.0f),	// ワールド座標
+				Vector3(0, 0, 0),	// 速度
+				Vector3(0, 0, 0),	// 加速度
+				Vector3(0, 0, 0),	// 回転角（初期）
+				Vector3(0, 0, 0),	// 回転角（最終）
+				Vector3(0, 0, 0),	// スケール（初期）
+				Vector3(6, 6, 6)	// スケール（最終）
+			);
+			it = m_enemis.erase(it);
+		}
+		else
+		{
+			it++;
+		}
+	}
+
+	ModelEffectManager::getInstance()->Update();
+
 }
 
 // Draws the scene.
@@ -294,13 +337,14 @@ void Game::Render()
 	m_objSkydome.Draw();
 
 	//地面を描画
-	m_objGround.Draw();
+	//m_objGround.Draw();
+	m_LandShape.Draw();
 
 	//球を描画
-	for (int i = 0; i < 20; i++)
-	{
-		m_ball->Draw(m_d3dContext.Get(), *m_states, m_world_ball[i], m_view, m_proj);
-	}
+	//for (int i = 0; i < 20; i++)
+	//{
+	//	m_ball->Draw(m_d3dContext.Get(), *m_states, m_world_ball[i], m_view, m_proj);
+	//}
 
 	//プレイヤーの描画
 	m_player->Render();
@@ -311,6 +355,8 @@ void Game::Render()
 		//enemy->Render();
 		(*it)->Render();
 	}
+
+	ModelEffectManager::getInstance()->Draw();
 
 	m_batch->Begin();
 	{

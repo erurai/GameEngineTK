@@ -5,32 +5,115 @@
       <UniqueIdentifier>db1dce17-1bfc-489e-a577-d444f6489d25</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dds;dlg;fbx;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tga;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{d7f06dd3-c996-4600-befd-9852a8670a11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Collision">
+      <UniqueIdentifier>{ff90757d-5630-4933-ac95-6a4c1abc9e87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Charactor">
+      <UniqueIdentifier>{7a5b8217-1fa9-4cbe-8081-05c35477452d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LandShape">
+      <UniqueIdentifier>{574e64cc-f235-4dba-9016-af27472a6987}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ModelEffect">
+      <UniqueIdentifier>{9a28cca4-e3bc-4607-b8fa-fa5303c5a5d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="State">
+      <UniqueIdentifier>{432d6189-8912-4161-acf9-93e8cc195f08}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="StepTimer.h" />
-    <ClInclude Include="DebugCamera.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="FollowCamera.h" />
-    <ClInclude Include="Obj3d.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="Enemy.h" />
-    <ClInclude Include="Collision.h" />
-    <ClInclude Include="CollisionNode.h" />
+    <ClInclude Include="Camera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="FollowCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision.h">
+      <Filter>Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionNode.h">
+      <Filter>Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>Charactor</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj3d.h">
+      <Filter>Charactor</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Charactor</Filter>
+    </ClInclude>
+    <ClInclude Include="LandShape.h">
+      <Filter>LandShape</Filter>
+    </ClInclude>
+    <ClInclude Include="LandShapeData.h">
+      <Filter>LandShape</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelEffect.h">
+      <Filter>ModelEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="Shot.h">
+      <Filter>State</Filter>
+    </ClInclude>
+    <ClInclude Include="Standing.h">
+      <Filter>State</Filter>
+    </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="DebugCamera.cpp" />
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="FollowCamera.cpp" />
-    <ClCompile Include="Obj3d.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="Collision.cpp" />
-    <ClCompile Include="CollisionNode.cpp" />
+    <ClCompile Include="Camera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="FollowCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Collision.cpp">
+      <Filter>Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionNode.cpp">
+      <Filter>Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>Charactor</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj3d.cpp">
+      <Filter>Charactor</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Charactor</Filter>
+    </ClCompile>
+    <ClCompile Include="LandShape.cpp">
+      <Filter>LandShape</Filter>
+    </ClCompile>
+    <ClCompile Include="LandShapeData.cpp">
+      <Filter>LandShape</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelEffect.cpp">
+      <Filter>ModelEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="Shot.cpp">
+      <Filter>State</Filter>
+    </ClCompile>
+    <ClCompile Include="Standing.cpp">
+      <Filter>State</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
